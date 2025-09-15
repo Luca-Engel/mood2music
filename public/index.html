@@ -64,15 +64,16 @@
         return e;
     }
 
-    function spinnerRow(text = "Thinking…") {
+    function spinnerRow(text = "Curating tracks…") {
         return el('div', {class: 'card spinning'}, el('div', {class: 'spinner'}), el('div', {class: 'spintext'}, text));
     }
 
     function recCard(rec, idx) {
         const link = rec.links?.spotify || null;
+        const titleLine = rec.title ? `${rec.title}${rec.artist ? ' — ' + rec.artist : ''}` : (rec.uri || '');
         const row1 = el('div', {class: 'rec-row'},
             el('div', {class: 'badge'}, String(idx + 1)),
-            el('div', {class: 'uri'}, link ? '' : (rec.uri || '')),
+            el('div', {class: 'uri'}, titleLine),
             link ? el('a', {href: link, target: '_blank', rel: 'noopener', class: 'btn'}, 'Open in Spotify') : null
         );
         const row2 = el('div', {class: 'reason'}, rec.reason || 'Fits the mood.');
@@ -86,7 +87,7 @@
         if (!mood) return;
 
         results.innerHTML = '';
-        results.appendChild(spinnerRow('Curating tracks…'));
+        results.appendChild(spinnerRow());
         goBtn.disabled = true;
 
         try {
@@ -96,6 +97,8 @@
                 body: JSON.stringify({mood, k})
             });
             const data = await res.json();
+
+            console.log(data);
 
             results.innerHTML = '';
             if (!res.ok) throw new Error(data?.detail || 'Server error');

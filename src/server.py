@@ -43,6 +43,7 @@ async def recommend(body: RecBody):
     try:
         # (Optional) safety clamp even if someone bypasses UI validation
         k = max(1, min(body.k, 10))
+        print("mood:", body.mood)
         result = agent.recommend(mood=body.mood, k=k)
         return result
     except Exception as e:
