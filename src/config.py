@@ -12,7 +12,7 @@ class Settings:
 
     # knobs
     max_movies: int = int(os.getenv("MAX_MOVIES", "8"))
-    seed_catalog_path: str = os.getenv("SEED_CATALOG", "data/seeds/tracks.csv")
+    song_metadata_path: str = os.getenv("SONG_METADATA", "data/seeds/tracks.csv")
 
     def validate(self):
         if not self.openai_api_key:

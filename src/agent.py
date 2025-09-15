@@ -7,11 +7,6 @@ from openai import OpenAI
 from .config import settings
 from .music_suggester import SeedCatalog
 
-import logging
-
-logger = logging.getLogger("mood2music.agent")
-logger.setLevel(logging.DEBUG)  # or INFO in prod
-
 # Optional: include titles/artists if you added spotify_client.py
 try:
     from .spotify_client import SpotifyClient  # requires SPOTIFY_CLIENT_ID/SECRET in .env
@@ -78,7 +73,7 @@ class Mood2MusicAgent:
         settings.validate()
         self.client = client or OpenAI(api_key=settings.openai_api_key)
         self.model = settings.openai_model
-        self.catalog = SeedCatalog(settings.seed_catalog_path)
+        self.catalog = SeedCatalog(settings.song_metadata_path)
         self.spotify = SpotifyClient() if SpotifyClient else None  # optional
 
     def parse_mood(self, mood: str) -> ParsedMood:
@@ -92,11 +87,8 @@ class Mood2MusicAgent:
             temperature=0.2,
             response_format={"type": "json_object"},
         )
-        message_content = resp.choices[0].message.content
-        print(message_content)
-        logger.debug("parse_mood response: %s", message_content)
 
-        mood_dict = safe_json(message_content or "{}")
+        mood_dict = safe_json(resp.choices[0].message.content or "{}")
 
         # Defaults (safe, reasonable)
         mood_dict.setdefault("valence", "neutral")
@@ -113,15 +105,9 @@ class Mood2MusicAgent:
         mood_dict.setdefault("loudness_db_range", [-18.0, -6.0])
         mood_dict.setdefault("mood_class", "calm")
 
-        logger.debug("parse_mood subsequent dict: %s", message_content)
-
-        print("mood dict:")
-        print(mood_dict, flush=True)
-
         return ParsedMood(**mood_dict)
 
     def recommend(self, mood: str, k: int = 6) -> Dict[str, Any]:
-        print("initial mood string:", mood)
         k = max(1, min(k, 10))
         parsed = self.parse_mood(mood)
 

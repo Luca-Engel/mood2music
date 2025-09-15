@@ -30,7 +30,7 @@ class SeedCatalog:
     """
 
     def __init__(self, path: str | None = None):
-        path = path or settings.seed_catalog_path
+        path = path or settings.song_metadata_path
         self.df = pd.read_csv(path)
 
         # Normalize names
