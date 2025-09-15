@@ -3,7 +3,6 @@
 A Python agent that maps free-text moods to music recommendations, using:
 
 - **OpenAI** (LLM) for mood parsing, tag generation, and re-ranking.
-- **TMDB** (optional) for *movie vibe* retrieval.
 - A small local **seed catalog** of tracks with tags and metadata.
 
 It ships with a CLI and a FastAPI HTTP API.
