@@ -57,8 +57,9 @@ Download the dataset from [Kaggle](https://www.kaggle.com/datasets/abdullahorzan
 
 API Server
 ```bash
-uvicorn src.server:app --reload --port 8000
+uv run uvicorn src.server:app --reload --port 8000
 ```
+
 - Open your browser to [http://localhost:8000](http://localhost:8000) to see the frontend.
 - Type your mood, select the number of tracks to be recommended in the dropdown (currently <=10 to reduce compute), and hit "Recommend".
 - The results then show:
