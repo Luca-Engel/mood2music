@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Mood → Music</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🎧 Mood → Music</h1>
+        <p class="sub">Type a vibe and get Spotify-ready track suggestions.</p>
+    </header>
+
+    <form id="rec-form" class="card">
+        <label for="mood">Your mood</label>
+        <input id="mood" name="mood" type="text" placeholder="e.g. cozy autumn study session, lo-fi and warm" required/>
+
+        <div class="row">
+            <label for="k">How many tracks?</label>
+            <select id="k" name="k">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6" selected>6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+
+        <button id="go" type="submit">Recommend</button>
+        <div id="hint">Tip: try “night drive, neon synthwave, energetic”.</div>
+    </form>
+
+    <section id="results"></section>
+
+    <footer>
+        <small>Backend: FastAPI @ <code>/recommend</code>. Your OpenAI key never leaves the server.</small>
+    </footer>
+</div>
+
+<script>
+    const form = document.getElementById('rec-form');
+    const results = document.getElementById('results');
+    const goBtn = document.getElementById('go');
+
+    function el(tag, attrs = {}, ...children) {
+        const e = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+            if (k === 'class') e.className = v;
+            else if (k === 'html') e.innerHTML = v;
+            else e.setAttribute(k, v);
+        }
+        for (const c of children) {
+            if (c == null) continue;
+            e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+        }
+        return e;
+    }
+
+    function spinnerRow(text = "Thinking…") {
+        return el('div', {class: 'card spinning'}, el('div', {class: 'spinner'}), el('div', {class: 'spintext'}, text));
+    }
+
+    function recCard(rec, idx) {
+        const link = rec.links?.spotify || null;
+        const row1 = el('div', {class: 'rec-row'},
+            el('div', {class: 'badge'}, String(idx + 1)),
+            el('div', {class: 'uri'}, link ? '' : (rec.uri || '')),
+            link ? el('a', {href: link, target: '_blank', rel: 'noopener', class: 'btn'}, 'Open in Spotify') : null
+        );
+        const row2 = el('div', {class: 'reason'}, rec.reason || 'Fits the mood.');
+        return el('div', {class: 'card rec'}, row1, row2);
+    }
+
+    form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const mood = document.getElementById('mood').value.trim();
+        const k = parseInt(document.getElementById('k').value || '6', 10);
+        if (!mood) return;
+
+        results.innerHTML = '';
+        results.appendChild(spinnerRow('Curating tracks…'));
+        goBtn.disabled = true;
+
+        try {
+            const res = await fetch('/recommend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mood, k})
+            });
+            const data = await res.json();
+
+            results.innerHTML = '';
+            if (!res.ok) throw new Error(data?.detail || 'Server error');
+
+            const recs = data?.recommendations || [];
+            if (recs.length === 0) {
+                results.appendChild(el('div', {class: 'empty card'}, 'No recommendations returned. Try a broader mood.'));
+                return;
+            }
+
+            results.appendChild(el('h2', {}, 'Recommendations'));
+            recs.forEach((r, i) => results.appendChild(recCard(r, i)));
+
+            if (data?.parsed) {
+                results.appendChild(el('h3', {}, 'Parsed Mood (debug)'));
+                results.appendChild(el('pre', {class: 'card parsed'}, JSON.stringify(data.parsed, null, 2)));
+            }
+        } catch (err) {
+            results.innerHTML = '';
+            results.appendChild(el('div', {class: 'error card'}, String(err?.message || err)));
+        } finally {
+            goBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
