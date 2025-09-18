@@ -61,6 +61,22 @@ input[type="text"], select {
     background: #0f1320;
     color: var(--fg);
     outline: none;
+    font-size: 14px;
+}
+
+select {
+    border: none;
+}
+
+.select-wrap {
+    width: 100%;
+    padding-right: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #0f1320;
+    color: var(--fg);
+    outline: none;
+    font-size: 14px;
 }
 
 .row {

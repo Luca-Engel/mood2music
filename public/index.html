@@ -12,7 +12,7 @@
 <body>
 <div class="container">
     <header>
-        <h1>🎧 Mood → Music</h1>
+        <h1>🎧 Mood → Music 🎧</h1>
         <p class="sub">Type a vibe and get Spotify-ready track suggestions.</p>
     </header>
 
@@ -22,22 +22,24 @@
 
         <div class="row">
             <label for="k">How many tracks?</label>
-            <select id="k" name="k">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6" selected>6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-            </select>
+            <div class="select-wrap">
+                <select id="k" name="k">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6" selected>6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
         </div>
 
         <button id="go" type="submit">Recommend</button>
-        <div id="hint">Tip: try “night drive, neon synthwave, energetic”.</div>
+        <div id="hint">Tip: try “night drive, summer holiday, calm”.</div>
     </form>
 
     <section id="results"></section>
